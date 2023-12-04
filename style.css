@@ -1,0 +1,307 @@
+/*==================== GOOGLE FONTS ====================*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+
+/*==================== BASE ====================*/
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+body{
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  justify-content: center;
+  min-height: 100vh;
+  background: #9B59B6;
+}
+/*========== CALENDAR ==========*/
+.calendar-wrapper{
+  width: 100%;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+  opacity: 1;
+}
+.calendar-wrapper header{
+  display: flex;
+  align-items: center;
+  padding: 25px 30px 10px;
+  justify-content: space-between;
+}
+header .icons{
+  display: flex;
+}
+header .icons span{
+  height: 38px;
+  width: 38px;
+  margin: 0 1px;
+  cursor: pointer;
+  color: #878787;
+  text-align: center;
+  line-height: 38px;
+  font-size: 1.9rem;
+  user-select: none;
+  border-radius: 50%;
+}
+.icons span:last-child{
+  margin-right: -10px;
+}
+header .icons span:hover{
+  background: #f2f2f2;
+}
+header .current-date{
+  font-size: 1.45rem;
+  font-weight: 500;
+}
+.calendar{
+  padding: 20px;
+}
+.calendar ul{
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  text-align: center;
+}
+.calendar .days{
+  margin-bottom: 20px;
+}
+.calendar li{
+  color: #333;
+  width: calc(100% / 7);
+  font-size: 1.07rem;
+}
+.calendar .weeks li{
+  font-weight: 500;
+  cursor: default;
+}
+.calendar .days li{
+  z-index: 1;
+  cursor: pointer;
+  position: relative;
+  margin-top: 30px;
+}
+.days li.inactive{
+  color: #aaa;
+}
+.days li.active{
+  color: #fff;
+}
+.days li::before{
+  position: absolute;
+  content: "";
+  left: 50%;
+  top: 50%;
+  height: 40px;
+  width: 40px;
+  z-index: -1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.days li.active::before{
+  background: #9B59B6;
+}
+.days li:not(.active):hover::before{
+  background: #f2f2f2;
+}
+
+
+/*==================== BOOKING TIME MODAL ====================*/
+.booking-time-modal{
+  width: 50%;
+  background: #fff;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.1);
+  padding: 0 0 0;
+  color: #333;
+  visibility: hidden;
+  transition: transform 0.4s, top 0.4s;
+  z-index: 1;
+}
+.open-booking-time-modal{
+  visibility: visible;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1);
+}
+ul.booking-time-list{
+  display: flex;
+  flex-wrap: wrap;
+  width: 50vw;
+  height: auto;
+  padding-left: 10%;
+  justify-content: center;
+}
+.booking-time-list li{
+  /*white-space: nowrap;*/
+  width: 50%;
+  margin-left: -8%;
+  padding: 2%;
+}
+.time-block.available {
+  /*background-color: #4bd649;*/
+  background-color: #4bd64915;
+  border: 3px solid #4bd649;
+  width: 80%;
+  border-radius: 20px;
+  padding: 6px 0;
+  color: #226921;
+  font-weight: 400;
+  cursor: pointer;
+}
+.time-block.unavailable {
+  /*background-color: #4bd649;*/
+  background-color: #d6494915;
+  border: 3px solid #d64949;
+  width: 80%;
+  border-radius: 20px;
+  padding: 6px 0;
+  color: #692121;
+  font-weight: 400;
+  cursor: pointer;
+}
+.booking-time-modal .modal-content{
+  position: center; 
+  background-color: white;
+  padding: 3%; 
+  margin: auto;
+  height: 85vh;
+  text-align: center;
+}
+
+/*==================== BOOKING FORM MODAL ====================*/
+.booking-modal{
+  width: 40%;
+  background: #fff;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.1);
+  padding: 0 0 0;
+  color: #333;
+  visibility: hidden;
+  transition: transform 0.4s, top 0.4s;
+  z-index: 1;
+}
+.open-booking-modal{
+  visibility: visible;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1);
+}
+.booking-modal .modal-content{
+  position: center; 
+  background-color: white;
+  padding: 3%; 
+  margin: auto;
+  height: 60vh;
+  text-align: center;
+}
+.client-service select{
+  margin-left: 10%;
+}
+.client-notes h6{
+  width: 100%;
+  margin-left: -335%;
+  margin-bottom: 0;
+}
+.client-notes textarea{
+  width: 58%;
+  border: 2px solid #9B59B6;
+  border-radius: 15px;
+}
+.booking-form-container div{
+  padding-bottom: 3%;
+}
+.time-block.available:hover{
+  box-shadow: 
+    0 2px 10px 0 #4bd649 inset, 0 2px 10px 0 #4bd649, 
+    0 2px 10px 0 #4bd649 inset, 0 2px 10px 0 #4bd649;
+  text-shadow: 0 0 2px #4bd649, 0 0 2px #4bd649;
+}
+.time-block.unavailable:hover{
+  box-shadow: 
+    0 2px 10px 0 #d64949 inset, 0 2px 10px 0 #d64949, 
+    0 2px 10px 0 #d64949 inset, 0 2px 10px 0 #d64949;
+  text-shadow: 0 0 2px #d64949, 0 0 2px #d64949;
+}
+
+/*==================== MODALS ====================*/
+.booking-time-modal, .booking-modal, .modal-content{
+  border-radius: 15px;
+}
+.modal-content h1{
+  margin: 0;
+}
+.modal-content p{
+  font-size: 14px;
+  opacity: 0.7;
+}
+.close-btn{
+  width: 10%;
+  margin-top: 5%;
+  margin-left: 45%;
+  padding: 10px 0;
+  background: #d64949;
+  color: #fff;
+  border: 0;
+  outline: none;
+  font-size: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+.close-btn:hover{
+  color: darkgray;
+}
+.client-name:after, .client-email:after, .client-phone:after, .client-service:after {
+  content: "*";
+  font-weight: bold;
+  color: red;
+}
+
+/*==================== RESPONSIVE ====================*/
+@media (max-width:700px){
+  .booking-modal, .booking-time-modal{
+    width: 95%;
+  }
+  .client-notes h6{
+    margin-left: -195%;
+  }
+  .client-service{
+    width: 50%;
+    margin-left: 10%;
+  }
+  .client-notes textarea{
+    width: 70%;
+  }
+  .close-btn{
+    padding: 5px 0;
+  }
+  .booking-time-modal{
+    width: 95%;
+  }
+  ul.booking-time-list{
+    width: 90vw;
+    margin-left: -5.5%;
+  }
+  .booking-time-list li{
+    white-space: nowrap;
+    margin-left: 0;
+  }
+  .time-block{
+    width: 100%;
+    font-size: 15px;
+  }
+  .booking-time-modal .modal-content{
+    height: 78vh;
+  }
+  .booking-modal .modal-content{
+    height: 66vh;
+  }
+  .booking-time-modal h2, .booking-modal h2{
+    margin-top: 5%;
+  }
+}
