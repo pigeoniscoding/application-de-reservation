@@ -5,6 +5,7 @@ const pool = require("./database")
 const corsOption = {
     origin : "*",
     methods: ["GET", "POST" , "PUT" , "DELETE"],
+    allowedHeaders: ["Content-Type"]
 }
 
 
@@ -21,9 +22,14 @@ app.get("/test",(req,res)=>{
     res.send("pigeon") ; 
 })
 
-app.get("/disponibilite",(req,res)=>{
-    // res.json({"dispo": "ok"});
-    pool.query ("SELECT statut_de_salle FROM `concerne`;", (error,result)=>{
+app.post("/disponibilite",(req,res)=>{
+    const { date, id } = req.body
+    
+    const parsedDate = new Date(date);
+    const formattedDate = parsedDate.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
+
+    
+    pool.query ("SELECT c.statut_de_salle FROM Concerne c INNER JOIN Reservation r ON c.Id_Reservation = r.Id_Reservation INNER JOIN Salles s ON c.Id_Salles = s.Id_Salles WHERE s.Id_Salles = ? AND r.Date = ? ;", [id,formattedDate], (error,result)=>{
         if(error){
             console.log(error);
             res.status(500).json({message : "echec lors de la requette"});
@@ -32,7 +38,9 @@ app.get("/disponibilite",(req,res)=>{
             console.log("dispo ok!");
             res.status(200).json({message: result});
         }
-    })  
+    }) 
+     
+    
 
 })
 

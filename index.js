@@ -1,17 +1,31 @@
-function fetchdata(){
+
+
+
+function fetchdata(date,Id_salle){
+    console.log(JSON.stringify(date));
+    const object = {
+        date: date,
+        id : Id_salle,
+    }
     //demander au backend d'envoyer les infos
-    fetch("http://localhost:3000/disponibilite")
+    fetch("http://localhost:3000/disponibilite", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(object)
+    })
     .then(res => res.json())
     .then(data => console.log(data)) //data = res.json
     .catch(error => console.log(error))
 
 }
 
-window.addEventListener("DOMContentLoaded",()=>{
-    fetchdata();
-})
+// window.addEventListener("DOMContentLoaded",()=>{
+//     fetchdata();
+// })
 
-
+//selectionner la salle
 const salle1 = document.querySelector('.salle1')
 const salle2 = document.querySelector('.salle2')
 const salle3 = document.querySelector('.salle3')
@@ -46,7 +60,11 @@ salle3.addEventListener('click', ()=>{
 
 console.log(Id_salle);
 
-let diponibilite = 0 ;
+//selectionner les jours
+
+
+
+// let diponibilite = 0 ;
 
 // selectionner les jours du calendrier
 const daysTag = document.querySelector(".days"),
@@ -119,11 +137,27 @@ const renderCalendar = () => {
             openBookingTimeModal() //si le jour est active (jour du mois: le formulaire s'ouvre)
     }) 
         // !!!!!a changer pour ouvrir la selection des salles!!!!
+    
 
 }
 //ceci est la partie importante pour le code
 
+
 renderCalendar() //executer la fonction
+
+function handleDates (){
+    const days = daysTag.querySelectorAll("li")
+    days.forEach(element => {
+    element.addEventListener("click",(e)=>{
+        console.log(e.target.textContent + currentDate.innerText);
+        const dataDate = e.target.textContent + currentDate.innerText;
+        fetchdata(dataDate,Id_salle);
+
+
+    })
+});
+}
+handleDates();
 
 
 
@@ -144,8 +178,12 @@ prevNextIcon.forEach(icon => {
         } else {
             date = new Date() // pass the current date as date value
         }
-        renderCalendar()
+  
+    renderCalendar()
+
+    handleDates();
     })
+
 })
 
 // Open and close the booking time modal
