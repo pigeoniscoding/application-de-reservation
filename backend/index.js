@@ -27,16 +27,41 @@ app.post("/disponibilite",(req,res)=>{
     
     const parsedDate = new Date(date);
     const formattedDate = parsedDate.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
-
     
-    pool.query ("SELECT c.statut_de_salle FROM Concerne c INNER JOIN Reservation r ON c.Id_Reservation = r.Id_Reservation INNER JOIN Salles s ON c.Id_Salles = s.Id_Salles WHERE s.Id_Salles = ? AND r.Date = ? ;", [id,formattedDate], (error,result)=>{
+    
+    pool.query ("SELECT Time FROM `reservation` WHERE Id_Salles=? AND Date=?;", [id,formattedDate], (error,result)=>{
         if(error){
             console.log(error);
             res.status(500).json({message : "echec lors de la requette"});
         }
         else{
             console.log("dispo ok!");
-            res.status(200).json({message: result});
+            const extractedData = result.map(row => row.Time);
+            res.status(200).json({ message: "Success", data: extractedData });
+        }
+    }) 
+     
+    
+
+})
+
+app.post("/reservation",(req,res)=>{
+    const { date,id,idTime } = req.body
+    
+    const parsedDate = new Date(date);
+    const formattedDate = parsedDate.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
+    
+    
+    
+    pool.query ("INSERT INTO reservation (Date,Time,Id_Salles) VALUES (? ,? ,?);", [formattedDate,idTime,id], (error,result)=>{
+        if(error){
+            console.log(error);
+            res.status(500).json({message : "echec lors de la requette"});
+        }
+        else{
+            console.log("dispo ok!");
+            
+            res.status(200).json({ message: "Success" });
         }
     }) 
      
