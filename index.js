@@ -1,6 +1,6 @@
 
 
-
+let timeData = {};
 function fetchdata(date,Id_salle){
     console.log(JSON.stringify(date));
     const object = {
@@ -16,10 +16,81 @@ function fetchdata(date,Id_salle){
         body: JSON.stringify(object)
     })
     .then(res => res.json())
-    .then(data => console.log(data)) //data = res.json
+    .then(data => {
+       
+    timeData = data.data
+    handelAvailablity(timeData);
+    }) //data = res.json
     .catch(error => console.log(error))
 
 }
+
+
+function fetchreservation(dateDate,Id_salle,idTime){   
+    
+    console.log(JSON.stringify(dateDate));
+    console.log(JSON.stringify(Id_salle));
+    console.log(JSON.stringify(idTime));
+    const object = {
+        date: dateDate,
+        id : Id_salle,
+        idTime : idTime,
+    }
+    //demander au backend d'envoyer les infos
+    fetch("http://localhost:3000/reservation", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(object)
+    })
+    .then(res => res.json())
+    
+    .then(data =>{
+        
+      
+        selectBlock();
+    })
+    .catch(error => console.log(error))
+
+    
+
+}
+
+
+function handelAvailablity(timeData){
+    
+    const allTimeBlocks = document.querySelectorAll('.time-block.available'); //selectionner les times blocks
+
+    const obj = timeData;
+    const arr = Object.values(obj).map(value => [value]);
+    
+    allTimeBlocks.forEach(block => {
+        let id = block.id;
+        
+        
+        arr.forEach(data=>{
+            if(id == data){
+                
+                block.classList.remove("available") //enlever la class
+                block.classList.add("unavailable") //ajouter une nouvelle classe
+            }
+        })
+         
+
+
+       })
+      ;
+      
+    const timeBlocks = document.querySelectorAll('.time-block.available');
+
+    timeBlocks.forEach(block => {
+    block.addEventListener('click', openBookingModal);
+    });
+      
+}
+
+
 
 // window.addEventListener("DOMContentLoaded",()=>{
 //     fetchdata();
@@ -145,19 +216,55 @@ const renderCalendar = () => {
 
 renderCalendar() //executer la fonction
 
+
+
+let dataDate;
 function handleDates (){
     const days = daysTag.querySelectorAll("li")
     days.forEach(element => {
     element.addEventListener("click",(e)=>{
+        
         console.log(e.target.textContent + currentDate.innerText);
-        const dataDate = e.target.textContent + currentDate.innerText;
+        dataDate = e.target.textContent + currentDate.innerText;
         fetchdata(dataDate,Id_salle);
+        
+        
+
+       
 
 
     })
 });
 }
 handleDates();
+
+let idTime;
+
+function selectBlock(dataDate) {
+
+    const days = daysTag.querySelectorAll("li")
+    days.forEach(element => {
+    element.addEventListener("click",(e)=>{
+        
+        console.log(e.target.textContent + currentDate.innerText);
+        dataDate = e.target.textContent + currentDate.innerText;});});
+    const blocks = document.querySelectorAll(".time-block.available");
+    blocks.forEach(block => {
+        block.addEventListener("click", (e) => {
+            idTime = block.id; // Access the id property of the clicked block
+            
+            
+       
+            
+            fetchreservation(dataDate,Id_salle,idTime);
+            
+        });
+        
+    });
+    console.log(dataDate);
+}
+
+selectBlock();
 
 
 
@@ -197,21 +304,21 @@ function closeBookingTimeModal(){
 
 
 
-function timeAvailable(){
-    if (diponibilite !== 1){
-        let timeAvailabilty = document.getElementById("1") ;//selectionner les time blocks
+// function timeAvailable(){
+//     if (diponibilite !== 1){
+//         let timeAvailabilty = document.getElementById("1") ;//selectionner les time blocks
 
-        console.log(timeAvailabilty)
+//         console.log(timeAvailabilty)
 
-        timeAvailabilty.classList.remove("available") //enlever la class
-        timeAvailabilty.classList.add("unavailable") //ajouter une nouvelle classe
+//         timeAvailabilty.classList.remove("available") //enlever la class
+//         timeAvailabilty.classList.add("unavailable") //ajouter une nouvelle classe
 
-        console.log(document.querySelector(".time-block unavailable"))
+//         console.log(document.querySelector(".time-block unavailable"))
         
-    }
-}
+//     }
+// }
 
-timeAvailable();
+// timeAvailable();
 
 // Open and close the booking form modal
 let booking_modal = document.getElementById("booking-modal")
@@ -226,9 +333,4 @@ function closeBookingModal(){
 // Open booking form when a time is clicked
 //ceci est tres important pour l'application!
 
-const timeBlocks = document.querySelectorAll('.time-block.available');
-
-timeBlocks.forEach(block => {
-  block.addEventListener('click', openBookingModal);
-});
 
