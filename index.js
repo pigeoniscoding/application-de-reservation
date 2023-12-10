@@ -47,10 +47,15 @@ function fetchreservation(dateDate,Id_salle,idTime){
     .then(res => res.json())
     
     .then(data =>{
-        
-      
-        selectBlock();
+       return handleDates ();
+       })
+    .then(result =>{
+        return handelAvailablity(timeData);
     })
+    .then (finalreult => {
+        return selectBlock(dataDate);
+    })
+    
     .catch(error => console.log(error))
 
     
@@ -86,6 +91,7 @@ function handelAvailablity(timeData){
 
     timeBlocks.forEach(block => {
     block.addEventListener('click', openBookingModal);
+    block.addEventListener('click',selectBlock(dataDate));
     });
       
 }
@@ -220,6 +226,7 @@ renderCalendar() //executer la fonction
 
 let dataDate;
 function handleDates (){
+    
     const days = daysTag.querySelectorAll("li")
     days.forEach(element => {
     element.addEventListener("click",(e)=>{
@@ -242,13 +249,19 @@ let idTime;
 
 function selectBlock(dataDate) {
 
-    const days = daysTag.querySelectorAll("li")
-    days.forEach(element => {
-    element.addEventListener("click",(e)=>{
+    
+    // const days = daysTag.querySelectorAll("li")
+    // days.forEach(element => {
+    // element.addEventListener("click",(e)=>{
         
-        console.log(e.target.textContent + currentDate.innerText);
-        dataDate = e.target.textContent + currentDate.innerText;});});
+    //     console.log(e.target.textContent + currentDate.innerText);
+    //     dataDate = e.target.textContent + currentDate.innerText;});
+    //     });
+
+    
+
     const blocks = document.querySelectorAll(".time-block.available");
+    console.log(blocks);
     blocks.forEach(block => {
         block.addEventListener("click", (e) => {
             idTime = block.id; // Access the id property of the clicked block
@@ -264,7 +277,7 @@ function selectBlock(dataDate) {
     console.log(dataDate);
 }
 
-selectBlock();
+
 
 
 
