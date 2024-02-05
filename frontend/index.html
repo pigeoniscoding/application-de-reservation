@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Reservation de salle</title>
+
+        <!-- introduire bootstrap -->
+        <!-- ==================== BOOTSTRAP CSS ====================  -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+        <!--==================== CSS ====================-->
+        <link rel="stylesheet" href="style.css">
+
+        <!-- ajouter des Google Fonts -->
+        <!--==================== FONT ====================-->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+        
+
+    </head>
+
+    <body>
+        
+        <div class="room-wrapper">
+            <button class="salle1">Salle 1</button>
+            <button class="salle2">Salle 2</button>
+            <button class="salle3">Salle 3</button>
+        </div>
+        <!--==================== MAIN ====================-->
+        <!-- main = designer la partie primaire pour les moteur de recherche -->
+        <main class="main"> 
+            <!--==================== CALENDAR ====================-->
+            <div class="calendar-wrapper" style="visibility: hidden;">
+
+                <!-- header = contient les introductions d'un element -->
+                <!-- cette partie represente la barre haute du calendrier -->
+                <header>
+                    <!-- QUESTION: how is the paragraphe changed in app? -->
+                    <p class="current-date">October 2022</p>
+                    <div class="icons">
+                        <!-- span est utiliser pour isoler un element pour le css -->
+                        <span id="prev" class="material-symbols-rounded">chevron_left</span>
+                        <span id="next" class="material-symbols-rounded">chevron_right</span>
+                    </div> 
+                </header>
+                <div class="calendar">
+                    <div>
+                        <!-- les jours sont representés par une liste non ordonnée -->
+                        <ul class="weeks">
+                            <li>Dim</li>
+                            <li>Lun</li>
+                            <li>Mar</li>
+                            <li>Mer</li>
+                            <li>Jeu</li>
+                            <li>Ven</li>
+                            <li>Sam</li>
+                        </ul>
+                        <ul class="days">
+                            <!-- les jour "inactive apparaiteront gris dans le calendrier cesont les jours qui
+                                 ne corresond pas au mois actuel" -->
+                            <!-- Comment les jour inactive changes ils? -->
+                            <li class="inactive">25</li>
+                            <li class="inactive">26</li>
+                            <li class="inactive">27</li>
+                            <li class="inactive">28</li>
+                            <li class="inactive">29</li>
+                            <li class="inactive">30</li>
+                            <!-- quand on click, l'element change de class et aura open-booking-time-modal -->
+                            <li id="open-booking-room-btn" onclick="openBookingRoomModal()">1</li>
+                            <li>2</li>
+                            <li>3</li>
+                            <li>4</li>
+                            <li>5</li>
+                            <li>6</li>
+                            <li>7</li>
+                            <li>8</li>
+                            <li>9</li>
+                            <li>10</li>
+                            <li>11</li>
+                            <li>12</li>
+                            <li>13</li>
+                            <li>14</li>
+                            <li>15</li>
+                            <li>16</li>
+                            <li>17</li>
+                            <li>18</li>
+                            <li>19</li>
+                            <li>20</li>
+                            <li>21</li>
+                            <li>22</li>
+                            <li>23</li>
+                            <li>24</li>
+                            <li class="active">25</li>
+                            <li>26</li>
+                            <li>27</li>
+                            <li>28</li>
+                            <li>29</li>
+                            <li>30</li>
+                            <li>31</li>
+                            <li class="inactive">1</li>
+                            <li class="inactive">2</li>
+                            <li class="inactive">3</li>
+                            <li class="inactive">4</li>
+                            <li class="inactive">5</li>
+                        </ul>
+                    </div>
+
+                
+
+                    <!--==================== BOOKING TIME MODAL ====================-->
+                    <div class="booking-time-modal" id="booking-time-modal">
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                        <!--  Modal windows are designed to temporarily interrupt the user's workflow and focus 
+                            their attention on a specific task or message. -->
+                            <h2>Time Select</h2>
+                            <p>Pick and reserve a time slot with me for a variety of services!</p>
+                                <div class="booking-time">
+                                    <ul class="booking-time-list">
+                                        <!-- time-block = will be an important class for db -->
+                                        
+                                        <!-- ajouter une class available/inavailable pour les time-blocks -->
+                                        <li><div class="time-block available" id="09:00:00">
+                                            9:00 - 10:00</div></li>
+                                        
+                                        <li><div class="time-block available" id= "10:00:00">10:00 - 11:00</div></li>
+                                        <li><div class="time-block available"id = "11:00:00">11:00 - 12:00</div></li>
+                                        <li><div class="time-block available" id = "12:00:00">12:00 - 13:00</div></li>
+                                        <li><div class="time-block available" id= "13:00:00">13:00 - 14:00</div></li>
+                                        <li><div class="time-block available" id= "14:00:00">14:00 - 15:00</div></li>
+                                        <li><div class="time-block available" id= "15:00:00">15:00 - 16:00</div></li>
+                                        <li><div class="time-block available"id= "16:00:00">16:00 - 17:00</div></li>
+                                        
+                                    </ul>
+                                </div>
+                            <button type="button" class="close-btn" onclick="closeBookingTimeModal()">&times;</button> 
+                            <!-- times is an entity name that represents x makes it easier for typing!-->
+                        </div>
+                    </div>
+
+                    <!--==================== BOOKING FORM MODAL ====================-->
+                    <div class="booking-modal" id="booking-modal">
+                        <!-- Modal content-->
+                        <!-- formulaire de reservation! -->
+                        <div class="modal-content">
+                            <h2>Booking Form</h2>
+                            <!-- paragraph a changer -->
+                            <p>Book now and secure your appointment!</p>
+                            <form>
+                                <div class="booking-form-container">
+                                    <!-- sera important pour remplir la bdd -->
+                                    <div class="client-name">
+                                        <label for="client-name"><h6>Name:</h6></label>
+                                        <input type="text" id="client-name" name="client-name" required>
+                                    </div>
+                                    <div class="client-email">
+                                        <label for="client-email"><h6>Email:</h6></label>
+                                        <input type="email" id="client-email" name="client-email" required>
+                                    </div>
+                                    <div class="client-phone">
+                                        <label for="client-phone"><h6>Phone:</h6></label>
+                                        <input type="tel" id="client-phone" name="client-phone">
+                                    </div>
+                                    <div class="client-service">
+                                        <label for="client-service"><h6>Service Wanted:</h6></label>
+                                        <select name="client-service" id="client-service" required>
+                                            <!-- peut etre utiliser pour la selection du materiel -->
+                                            <option selected>[Select from drop down]</option>
+                                            <option>Graphics/ Flyers</option>
+                                            <option>Cover Art</option>
+                                            <option>Logos</option>
+                                            <option>Website Development</option>
+                                            <option>Custom Clothes Printing</option>
+                                            <option>Marketing/ PR Management</option>
+                                            <option>Event/Club Hosting</option>
+                                        </select>
+                                    </div>
+                                    <div class="client-notes">
+                                        <label for="client-notes"><h6>Notes:</h6></label>
+                                        <br>
+                                        <textarea id="client-notes" name="client-notes" rows="4" cols="22" placeholder="Add a note for me here"></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                            <button type="button" class="close-btn" onclick="closeBookingModal()">&times;</button>
+                            <!-- faudra ajouter un bouton submit -->
+                            <!-- sera important pour remplir la bdd -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer>
+
+        </footer>
+        <!--==================== CALENDAR JS ====================-->
+        <script type="module" src="index.js" defer></script>
+        
+        <!--==================== JQUERY ====================-->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" 
+        crossorigin="anonymous"></script>
+        
+        <!--==================== MAIN JS ====================-->
+        <!-- <script src="js/main.js"></script> -->
+    </body>
+</html>
