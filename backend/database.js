@@ -1,12 +1,10 @@
 //connection de la base de donnee
-const{ createPool} = require('mysql');
+const{ createPool } = require('mysql2/promise');
 const pool = createPool({
-
     host: "localhost",
     user: "root",
     password: "",
     database: "application de reservation",
-    connectionlimit:10, //nombre limite de connections en paralleles 
 })
 
 pool.getConnection((err, connection)=>{
