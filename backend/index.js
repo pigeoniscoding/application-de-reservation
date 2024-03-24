@@ -143,24 +143,11 @@ app.post("/loginAdmin",async(req, res)=> {
     }
 })
 
-//route pour inserrer un admin
-app.post("/signinAdmin",async (req, res) => {
-    const {nom, prenom,dateNaissance, email, mdp} = req.body;
-    const [result] = await pool.query("SELECT * FROM `gestionnaires` WHERE email= ?",[email]);
-    console.log(result);
-    if (result.length > 0){
-        return res.status(400).json({error : "cet utilisateur existe déja"})
-    }
-    //hacher le mot de pass
-    const hashedPassword = await bcrypt.hash(mdp, 4);
-    await pool.query("INSERT INTO `gestionnaires`( `nom`, `prenom`, `date_de_naissance`, `email`, `mdp`) VALUES (?,?,?,?,?)",[nom, prenom,dateNaissance, email, hashedPassword]);
-    res.status(201).json('ajout réussi')
-});
 
 //route pour afficher les utilisateurs
 app.get("/utilisateurs", async (req, res) => {
     try {
-      const [rows] = await pool.query("SELECT * FROM utilisateurs");
+      const [rows] = await pool.query("SELECT * FROM utilisateurs WHERE Est_Admin = 0");
       res.json(rows);
 
     } catch (error) {
@@ -177,7 +164,7 @@ app.get("/utilisateurs", async (req, res) => {
     }
   
     try {
-      const [rows] = await pool.query("SELECT * FROM utilisateurs WHERE Adress_mail = ?", [email]);
+      const [rows] = await pool.query("SELECT * FROM utilisateurs WHERE Adress_mail = ? AND Est_Admin = 0", [email]);
       if (rows.length === 0) {
         return res.status(404).json({ error: "Aucun utilisateur trouvé avec cette adresse e-mail." });
       }
@@ -239,6 +226,165 @@ app.get("/recupsalles", async (req, res) => {
     }
   });
 
+  //route pour effacer les chambres 
+  app.post("/deleteRoom",async (req,res)=>{
+    const { Id_Salles } = req.body
+    
+  
+    
+    await pool.query ("DELETE FROM `salles` WHERE Id_Salles = ?", [Id_Salles])
+            console.log (Id_Salles);
+            res.status(200).json({ message: "Success" });
+
+})
+
+//ajouter une salle
+app.post("/AddRoom",async (req,res)=>{
+  const { Numero_de_la_salle, Capacite, Description, } = req.body
+  
+
+  
+  await pool.query ("INSERT INTO `salles`( `Numero_de_la_salle`, `Capacite`, `Description`) VALUES (?,?,?)", [Numero_de_la_salle,Capacite,Description])
+          
+          res.status(200).json({ message: "Success" });
+
+})
+
+//afficher un admin
+app.get("/afficherAdmin", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM `utilisateurs` WHERE Est_Admin = 1");
+    res.json(rows);
+
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la récupération des Admin." });
+  }
+});
+
+//chercher un Admin avec un email
+app.get("/chercherAdmin", async (req, res) => {
+  const email = req.query.email;
+  if (!email) {
+    return res.status(400).json({ error: "Veuillez fournir une adresse e-mail pour la recherche." });
+  }
+
+  try {
+    const [rows] = await pool.query("SELECT * FROM utilisateurs WHERE Adress_mail = ? AND Est_Admin = 1", [email]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Aucun utilisateur trouvé avec cette adresse e-mail." });
+    }
+    res.json(rows);
+  } catch (error) {
+    console.error("Erreur lors de la recherche des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
+  }
+});
+
+//ajouter un Admin
+app.post("/AddAdmin",async (req,res)=>{
+  const { Email} = req.body
+  
+
+  
+  await pool.query ("UPDATE `utilisateurs` SET Est_Admin = 1 WHERE Adress_mail = ?", [Email])
+          console.log (Email);
+          res.status(200).json({ message: "Success" });
+
+})
+
+//ajouter un client 
+app.post("/AddClient",async (req, res) => {
+  const {nom, prenom, email, mdp, Numero_de_telephone, Date_de_naissance} = req.body;
+  const [result] = await pool.query("SELECT * FROM utilisateurs WHERE Adress_mail= ?",[email]);
+  console.log(result);
+  if (result.length > 0){
+      return res.status(400).json({error : "cet utilisateur existe déja"})
+  }
+  //hacher le mot de pass
+  const hashedPassword = await bcrypt.hash(mdp, 4);
+  await pool.query("INSERT INTO `utilisateurs`(`Nom`, `Prenom`, `Adress_mail`, `mot_de_pass`, `Numero_de_telephone`, `Date_de_naissance`) VALUES (?,?,?,?,?,?)",[nom, prenom, email, hashedPassword, Numero_de_telephone, Date_de_naissance]);
+  res.status(201).json('ajout réussi')
+});
+
+//afficher une reservation
+app.get("/afficherReservation", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM `reservation`");
+    res.json(rows);
+
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la récupération des Admin." });
+  }
+});
+
+//chercher une reservation
+
+app.post("/chercherRservation", async (req, res) => {
+  const Id_Salles = req.body.Id_Salles; // Récupérer Id_Salles depuis le corps de la requête
+  const Date = req.body.Date; // Récupérer Date depuis le corps de la requête
+  const Time = req.body.Time; // Récupérer Time depuis le corps de la requête
+  if (!Id_Salles || !Date || !Time) {
+    return res.status(400).json({ error: "Veuillez fournir les données pour la recherche." });
+  }
+
+  try {
+    const [rows] = await pool.query("SELECT * FROM reservation WHERE Id_Salles = ? AND Date = ? AND Time = ?", [Id_Salles, Date, Time]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Aucune reservation avec ces données." });
+    }
+    res.json(rows);
+  } catch (error) {
+    console.error("Erreur lors de la recherche des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
+  }
+});
+
+//supprimer une reservation
+app.post("/deleteReservation", async (req, res) => {
+  const Id_Salles = req.body.Id_Salles; // Récupérer Id_Salles depuis le corps de la requête
+  const Date = req.body.Date; // Récupérer Date depuis le corps de la requête
+  const Time = req.body.Time; // Récupérer Time depuis le corps de la requête
+  if (!Id_Salles || !Date || !Time) {
+    return res.status(400).json({ error: "Veuillez fournir les données pour la recherche." });
+  }
+
+  try {
+    const [rows] = await pool.query("DELETE FROM reservation WHERE Id_Salles = ? AND Date = ? AND Time = ?", [Id_Salles, Date, Time]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Aucune reservation avec ces données." });
+    }
+    res.json(rows);
+  } catch (error) {
+    console.error("Erreur lors de la recherche des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
+  }
+});
+
+//ajouter une reservation
+app.post("/addReservation", async (req, res) => {
+  const Details = req.body.Details;
+  const Date = req.body.Date; // Récupérer Date depuis le corps de la requête
+  const Time = req.body.Time; // Récupérer Time depuis le corps de la requête
+  const Id_Salles = req.body.Id_Salles; // Récupérer Id_Salles depuis le corps de la requête
+  const Materiel = req.body.Materiel;
+  
+  if (!Id_Salles || !Date || !Time) {
+    return res.status(400).json({ error: "Veuillez fournir les données pour la recherche." });
+  }
+
+  try {
+    const [rows] = await pool.query("INSERT INTO `reservation`( `Details`, `Date`, `Time`, `Id_Salles`, `Materiel`, `Date_de_reservation`) VALUES (?,?,?,?,?, NOW())", [Details, Date, Time, Id_Salles, Materiel]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Aucune reservation avec ces données." });
+    }
+    res.json(rows);
+  } catch (error) {
+    console.error("Erreur lors de la recherche des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
+  }
+});
 
 
 app.listen(3000 , ()=>{
