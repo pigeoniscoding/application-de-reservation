@@ -21,12 +21,13 @@
     </head>
 
     <body>
-        
-        <div class="room-wrapper">
+        <div id="salle-buttons-container"></div>
+
+        <!-- <div class="room-wrapper">
             <button class="salle1">Salle 1</button>
             <button class="salle2">Salle 2</button>
             <button class="salle3">Salle 3</button>
-        </div>
+        </div> -->
         <!--==================== MAIN ====================-->
         <!-- main = designer la partie primaire pour les moteur de recherche -->
         <main class="main"> 
@@ -134,7 +135,7 @@
                                         
                                     </ul>
                                 </div>
-                            <button type="button" class="close-btn" onclick="closeBookingTimeModal()">&times;</button> 
+                            <button type="button" class="close-btn" onclick="document.getElementById('booking-time-modal').classList.remove('open-booking-time-modal')">&times;</button> 
                             <!-- times is an entity name that represents x makes it easier for typing!-->
                         </div>
                     </div>
@@ -146,44 +147,47 @@
                         <div class="modal-content">
                             <h2>Booking Form</h2>
                             <!-- paragraph a changer -->
-                            <p>Book now and secure your appointment!</p>
+                            <p>Reservez votre salle!</p>
                             <form>
                                 <div class="booking-form-container">
                                     <!-- sera important pour remplir la bdd -->
-                                    <div class="client-name">
-                                        <label for="client-name"><h6>Name:</h6></label>
+                                    <!-- <div class="client-name">
+                                        <label for="client-name"><h6>Nom:</h6></label>
                                         <input type="text" id="client-name" name="client-name" required>
-                                    </div>
-                                    <div class="client-email">
+                                    </div> -->
+                                    <!-- <div class="client-first-name">
+                                        <label for="client-first-name"><h6>Prenom:</h6></label>
+                                        <input type="text" id="client-first-name" name="client-first-name" required>
+                                    </div> -->
+                                    <!-- <div class="client-email">
                                         <label for="client-email"><h6>Email:</h6></label>
                                         <input type="email" id="client-email" name="client-email" required>
-                                    </div>
-                                    <div class="client-phone">
-                                        <label for="client-phone"><h6>Phone:</h6></label>
+                                    </div> -->
+                                    <!-- <div class="client-phone">
+                                        <label for="client-phone"><h6>Numero de telephone:</h6></label>
                                         <input type="tel" id="client-phone" name="client-phone">
-                                    </div>
+                                    </div> -->
                                     <div class="client-service">
-                                        <label for="client-service"><h6>Service Wanted:</h6></label>
-                                        <select name="client-service" id="client-service" required>
+                                        <label for="client-equipement"><h6>Equipement:</h6></label>
+                                        <select name="client-equipement" id="client-equipement" required>
                                             <!-- peut etre utiliser pour la selection du materiel -->
-                                            <option selected>[Select from drop down]</option>
-                                            <option>Graphics/ Flyers</option>
-                                            <option>Cover Art</option>
-                                            <option>Logos</option>
-                                            <option>Website Development</option>
-                                            <option>Custom Clothes Printing</option>
-                                            <option>Marketing/ PR Management</option>
-                                            <option>Event/Club Hosting</option>
+                                            <option selected>Choisissez votre equipement:</option>
+                                            <option>pas d'équipements</option>
+                                            <option>équipements de capture video</option>
+                                            <option>équipements de capture audio</option>
+                                            <option>équipements de captures video et audio</option>
+                                            
                                         </select>
                                     </div>
-                                    <div class="client-notes">
-                                        <label for="client-notes"><h6>Notes:</h6></label>
+                                    <div class="client-details">
+                                        <label for="client-details"><h6>Details:</h6></label>
                                         <br>
-                                        <textarea id="client-notes" name="client-notes" rows="4" cols="22" placeholder="Add a note for me here"></textarea>
+                                        <textarea id="client-details" name="client-details" rows="4" cols="22" placeholder="Ajoutez vos details ici!"></textarea>
                                     </div>
                                 </div>
                             </form>
-                            <button type="button" class="close-btn" onclick="closeBookingModal()">&times;</button>
+                            <button type="button" class="submit-btn">Envoyer</button>
+                            <button type="button" class="close-btn" onclick="document.getElementById('booking-modal').classList.remove('open-booking-modal')">&times;</button>
                             <!-- faudra ajouter un bouton submit -->
                             <!-- sera important pour remplir la bdd -->
                         </div>

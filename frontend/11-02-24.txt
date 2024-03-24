@@ -1,0 +1,18 @@
+modifications sur la base de donnée : 
+- table utilisateurs => supprission de mot de pass ,genre , adress_physique, code_postal, Ville
+- table reservation => supression de durée de réservation, ajout de "Date_de_reservation" 
+question :? est il utile d'ajouter une Date_de_reservation ?
+- table materiel : drop la table
+-table reservation : ajout de "materiel"
+
+	Cameras_et_equipement_de_capture_video
+    Microphones_et_equipement_audio
+
+- pour remplir la bdd avec le formulaire
+    => API 1 : récuperer le email de l'utilisateur selon le nom et le prenom
+    
+    => si l'utilisateur existe : ajouter son id a la reservation
+    => sinon :envoyer un message pour dire qu'il faut s'inscrire
+
+    ce qui est fait : 
+    -API 1
