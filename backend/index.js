@@ -295,15 +295,15 @@ app.post("/AddAdmin",async (req,res)=>{
 
 //ajouter un client 
 app.post("/AddClient",async (req, res) => {
-  const {nom, prenom, email, mdp, Numero_de_telephone, Date_de_naissance} = req.body;
-  const [result] = await pool.query("SELECT * FROM utilisateurs WHERE Adress_mail= ?",[email]);
+  const {Nom, Prenom,  Adress_mail, Mot_de_pass, Numero_de_telephone, Date_de_naissance} = req.body;
+  const [result] = await pool.query("SELECT * FROM utilisateurs WHERE Adress_mail= ?",[Adress_mail]);
   console.log(result);
   if (result.length > 0){
       return res.status(400).json({error : "cet utilisateur existe déja"})
   }
   //hacher le mot de pass
-  const hashedPassword = await bcrypt.hash(mdp, 4);
-  await pool.query("INSERT INTO `utilisateurs`(`Nom`, `Prenom`, `Adress_mail`, `mot_de_pass`, `Numero_de_telephone`, `Date_de_naissance`) VALUES (?,?,?,?,?,?)",[nom, prenom, email, hashedPassword, Numero_de_telephone, Date_de_naissance]);
+  const hashedPassword = await bcrypt.hash(Mot_de_pass, 4);
+  await pool.query("INSERT INTO `utilisateurs`(`Nom`, `Prenom`, `Adress_mail`, `mot_de_pass`, `Numero_de_telephone`, `Date_de_naissance`,`Est_Admin`) VALUES (?,?,?,?,?,?,0)",[Nom, Prenom, Adress_mail, hashedPassword, Numero_de_telephone, Date_de_naissance]);
   res.status(201).json('ajout réussi')
 });
 
@@ -386,6 +386,53 @@ app.post("/addReservation", async (req, res) => {
   }
 });
 
+//afficher le nombre de client 
+app.get("/afficherNbClient", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT COUNT(*) FROM `utilisateurs` WHERE Est_Admin = 0 ");
+    res.json(rows);
+
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la récupération des Admin." });
+  }
+});
+
+//afficher le nombre d'admins
+app.get("/afficherNbAdmins", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT COUNT(*) FROM `utilisateurs` WHERE Est_Admin = 1 ");
+    res.json(rows);
+
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la récupération des Admin." });
+  }
+});
+
+//afficher le nombre de salle
+app.get("/afficherNbRooms", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT COUNT(*) FROM `salles`");
+    res.json(rows);
+
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la récupération des Admin." });
+  }
+});
+
+//afficher le nombre de reservation
+app.get("/afficherNbReservation", async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT COUNT(*) FROM `reservation`");
+    res.json(rows);
+
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la récupération des Admin." });
+  }
+});
 
 app.listen(3000 , ()=>{
     console.log("le serveur tourne!")
