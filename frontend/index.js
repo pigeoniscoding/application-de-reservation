@@ -284,7 +284,7 @@ function openBookingTimeModal(){
 
 function closeBookingTimeModal(){
     //ferme la liste des heures de reservation (les blocks)
-    bookingTime_modal.classList.remove("open-booking-time-modal");
+    document.getElementById('booking-modal').classList.remove('open-booking-modal')
 }
 
 let booking_modal = document.getElementById("booking-modal");
@@ -292,6 +292,7 @@ let booking_modal = document.getElementById("booking-modal");
 function openBookingModal(){
     //ouvre le formulair
     booking_modal.classList.add("open-booking-modal");
+    document.getElementById('booking-time-modal').classList.remove('open-booking-time-modal') //ferme la page pour choisir les dates
 }
 
 function closeBookingModal(){

@@ -175,6 +175,7 @@ ul.booking-time-list{
 /*==================== BOOKING FORM MODAL ====================*/
 .booking-modal{
   width: 40%;
+  height: 90%;
   background: #fff;
   position: absolute;
   top: 0;
