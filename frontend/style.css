@@ -15,7 +15,7 @@ body{
   padding: 0 10px;
   justify-content: center;
   min-height: 100vh;
-  background: #9B59B6;
+  background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
 }
 /*========== CALENDAR ==========*/
 .calendar-wrapper{
