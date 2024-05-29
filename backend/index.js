@@ -3,6 +3,7 @@ const cors = require("cors");
 const pool = require("./database");
 const bcrypt = require('bcrypt');
 const saltRounds = 4;
+const moment = require('moment'); //pour la gestion des formats des dates 
 
 
 
@@ -143,12 +144,37 @@ app.post("/loginAdmin",async(req, res)=> {
     }
 })
 
+//route pour login des admins test
+app.post("/loginAdminTest",async(req, res)=> {
+  const {email,mdp} = req.body;
+  const [result] = await pool.query ("SELECT * FROM utilisateurs WHERE Est_Admin = 1",[email]);
+  if (result.length === 0){
+      return res.status(401).json({error : "Utilisateur non trouvé"});
+  }
+  console.log([result][0][0])
+  const user = [result][0][0];
+  const passwordMatch = await bcrypt.compare(mdp, user.mot_de_pass);
+  console.log(passwordMatch);
+  if (passwordMatch === false){
+      return res.status(401).json({error: "mot de passe incorrect!"});
+  }
+  else{
+      res.status(201).json({message:"sucess",pass: passwordMatch ,id: user.Id_Personnes});
+  }
+})
+
 
 //route pour afficher les utilisateurs
 app.get("/utilisateurs", async (req, res) => {
     try {
       const [rows] = await pool.query("SELECT * FROM utilisateurs WHERE Est_Admin = 0");
-      res.json(rows);
+      const formattedRows = rows.map(user => ({
+        ...user,
+        Date_de_naissance: moment(user.Date_de_naissance).format('YYYY/MM/DD')
+      }));
+  
+      res.json(formattedRows);
+     
 
     } catch (error) {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
@@ -250,11 +276,29 @@ app.post("/AddRoom",async (req,res)=>{
 
 })
 
+//modifier une salle
+app.post("/UpdateRoom",async (req,res)=>{
+  const { Numero_de_la_salle, Capacite, Description,Id_Salles } = req.body
+  
+
+  
+  await pool.query ("UPDATE `salles` SET `Numero_de_la_salle`=?,`Capacite`=?,`Description`= ? WHERE Id_Salles = ?", [Numero_de_la_salle,Capacite,Description,Id_Salles])
+          
+          res.status(200).json({ message: "Success" });
+
+})
+
 //afficher un admin
 app.get("/afficherAdmin", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM `utilisateurs` WHERE Est_Admin = 1");
-    res.json(rows);
+    const formattedRows = rows.map(user => ({
+      ...user,
+      Date_de_naissance: moment(user.Date_de_naissance).format('YYYY/MM/DD')
+    }));
+
+    res.json(formattedRows);
+  
 
   } catch (error) {
     console.error("Erreur lors de la récupération des utilisateurs :", error);
@@ -298,6 +342,36 @@ app.post("/AddClient",async (req, res) => {
   const {Nom, Prenom,  Adress_mail, Mot_de_pass, Numero_de_telephone, Date_de_naissance} = req.body;
   const [result] = await pool.query("SELECT * FROM utilisateurs WHERE Adress_mail= ?",[Adress_mail]);
   console.log(result);
+  //l'adresse mail est nécessaire 
+  if (!Adress_mail) {
+    return res.status(400).json({ error: "L'adresse e-mail est requise" });
+  }
+
+  //le mot de passe est nécessaire
+  if (!Mot_de_pass) {
+    return res.status(400).json({ error: "Le mot de passe est requis" });
+  }
+
+   // Vérifier si le nom est fourni et est une chaîne de caractères
+   if (!Nom || typeof Nom !== 'string') {
+    return res.status(400).json({ error: "Le nom est requis et doit être une chaîne de caractères" });
+  }
+
+  // Vérifier si le prénom est fourni et est une chaîne de caractères
+  if (!Prenom || typeof Prenom !== 'string') {
+    return res.status(400).json({ error: "Le prénom est requis et doit être une chaîne de caractères" });
+  }
+
+  // Fonction pour vérifier si une date est au format 'yyyy-mm-dd'
+function isValidDateFormat(dateString) {
+  const regEx = /^\d{4}-\d{2}-\d{2}$/;
+  return regEx.test(dateString);
+}
+  //verifier le format de la date de naissance
+  if (!Date_de_naissance || !isValidDateFormat(Date_de_naissance)) {
+    return res.status(400).json({ error: "La date de naissance est requise et doit être au format 'yyyy-mm-dd'" });
+  }
+
   if (result.length > 0){
       return res.status(400).json({error : "cet utilisateur existe déja"})
   }
@@ -311,11 +385,18 @@ app.post("/AddClient",async (req, res) => {
 app.get("/afficherReservation", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM `reservation`");
-    res.json(rows);
+    const formattedRows = rows.map(user => ({
+      ...user,
+      Date: moment(user.Date_de_naissance).format('YYYY/MM/DD'),
+      Date_de_reservation: moment(user.Date_de_naissance).format('YYYY/MM/DD')
+    }));
+
+    res.json(formattedRows);
+    
 
   } catch (error) {
     console.error("Erreur lors de la récupération des utilisateurs :", error);
-    res.status(500).json({ error: "Erreur lors de la récupération des Admin." });
+    res.status(500).json({ error: "Erreur lors de la récupération des Reservations." });
   }
 });
 
@@ -434,7 +515,34 @@ app.get("/afficherNbReservation", async (req, res) => {
   }
 });
 
+
+app.post("/lostPassword", async (req, res) => {
+  console.log(req.body);
+  console.log('fffffffff');
+  const {email, nouveauMdp,confirmMdp} = req.body;
+  const [result] = await pool.query("SELECT * FROM utilisateurs WHERE Adress_mail = ?", [email]);
+  console.log(result);
+
+  if (result.length === 0){
+      return res.status(400).json({error : "l'email n'existe pas dans la bdd"})
+  }
+  if (nouveauMdp === confirmMdp){
+
+    const hashedPassword = await bcrypt.hash(nouveauMdp, 4);
+    await pool.query("UPDATE `utilisateurs` SET `mot_de_pass`=? WHERE `Adress_mail`= ?;",[hashedPassword, email]);
+    res.status(201).json('ajout réussi')
+  }
+  else{
+    return res.status(400).json({error : "les deux mots de passes ne sont pas identiques"})
+  }
+
+});
+
 app.listen(3000 , ()=>{
     console.log("le serveur tourne!")
 }) //verifier que le serveur marche
+
+
+//exporter pour les test
+module.exports = app;
 
