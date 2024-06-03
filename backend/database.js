@@ -5,7 +5,7 @@ const pool = createPool({
     user: "root",
     password: "",
     database: "application de reservation",
-})
+});
 
 pool.getConnection((err, connection)=>{
     if(err){

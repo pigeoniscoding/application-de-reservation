@@ -381,14 +381,14 @@ function isValidDateFormat(dateString) {
   res.status(201).json('ajout réussi')
 });
 
-//afficher une reservation
+// //afficher une reservation
 app.get("/afficherReservation", async (req, res) => {
   try {
     const [rows] = await pool.query("SELECT * FROM `reservation`");
     const formattedRows = rows.map(user => ({
       ...user,
-      Date: moment(user.Date_de_naissance).format('YYYY/MM/DD'),
-      Date_de_reservation: moment(user.Date_de_naissance).format('YYYY/MM/DD')
+      Date: moment(user.Date).format('YYYY/MM/DD'),
+      
     }));
 
     res.json(formattedRows);
@@ -402,25 +402,35 @@ app.get("/afficherReservation", async (req, res) => {
 
 //chercher une reservation
 
-app.post("/chercherRservation", async (req, res) => {
-  const Id_Salles = req.body.Id_Salles; // Récupérer Id_Salles depuis le corps de la requête
-  const Date = req.body.Date; // Récupérer Date depuis le corps de la requête
-  const Time = req.body.Time; // Récupérer Time depuis le corps de la requête
-  if (!Id_Salles || !Date || !Time) {
-    return res.status(400).json({ error: "Veuillez fournir les données pour la recherche." });
-  }
+// app.post("/chercherRservation", async (req, res) => {
+//   const Id_Salles = req.body.Id_Salles; // Récupérer Id_Salles depuis le corps de la requête
+//   const ReservationDate = req.body.Date; // Récupérer Date depuis le corps de la requête
+//   const Time = req.body.Time; // Récupérer Time depuis le corps de la requête
 
-  try {
-    const [rows] = await pool.query("SELECT * FROM reservation WHERE Id_Salles = ? AND Date = ? AND Time = ?", [Id_Salles, Date, Time]);
-    if (rows.length === 0) {
-      return res.status(404).json({ error: "Aucune reservation avec ces données." });
-    }
-    res.json(rows);
-  } catch (error) {
-    console.error("Erreur lors de la recherche des utilisateurs :", error);
-    res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
-  }
-});
+//   const formattedDate = moment(ReservationDate).format('YYYY/MM/DD')
+
+//   if (!Id_Salles || !ReservationDate || !Time) {
+//     return res.status(400).json({ error: "Veuillez fournir les données pour la recherche." });
+//   }
+
+//   try {
+//     const [rows] = await pool.query("SELECT * FROM reservation WHERE Id_Salles = ? AND Date = ? AND Time = ?", [Id_Salles, formattedDate, Time]);
+//     if (rows.length === 0) {
+//       return res.status(404).json({ error: "Aucune reservation avec ces données." });
+//     }
+//     const formattedRows = rows.map(user => ({
+//       ...user,
+//       Date: moment(user.Date).format('YYYY/MM/DD'),
+      
+//     }));
+
+//     res.json(formattedRows);
+    
+//   } catch (error) {
+//     console.error("Erreur lors de la recherche des utilisateurs :", error);
+//     res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
+//   }
+// });
 
 //supprimer une reservation
 app.post("/deleteReservation", async (req, res) => {
@@ -443,20 +453,23 @@ app.post("/deleteReservation", async (req, res) => {
   }
 });
 
+
 //ajouter une reservation
 app.post("/addReservation", async (req, res) => {
   const Details = req.body.Details;
   const Date = req.body.Date; // Récupérer Date depuis le corps de la requête
+  const Id_Personnes_ = req.body.Id_Personnes_
   const Time = req.body.Time; // Récupérer Time depuis le corps de la requête
   const Id_Salles = req.body.Id_Salles; // Récupérer Id_Salles depuis le corps de la requête
   const Materiel = req.body.Materiel;
+  
   
   if (!Id_Salles || !Date || !Time) {
     return res.status(400).json({ error: "Veuillez fournir les données pour la recherche." });
   }
 
   try {
-    const [rows] = await pool.query("INSERT INTO `reservation`( `Details`, `Date`, `Time`, `Id_Salles`, `Materiel`, `Date_de_reservation`) VALUES (?,?,?,?,?, NOW())", [Details, Date, Time, Id_Salles, Materiel]);
+    const [rows] = await pool.query("INSERT INTO `reservation`( `Details`, `Date`,`Id_Personnes_`, `Time`, `Id_Salles`, `Materiel`, `Date_de_reservation`) VALUES (?,?,?,?,?,?, NOW())", [Details, Date, Id_Personnes_, Time, Id_Salles, Materiel]);
     if (rows.length === 0) {
       return res.status(404).json({ error: "Aucune reservation avec ces données." });
     }
@@ -466,6 +479,25 @@ app.post("/addReservation", async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
   }
 });
+
+//trouver le id de l'admin 
+app.post("/chercherIDconnecte", async (req, res) => {
+  const emailAdmin = req.body.emailAdmin;
+  console.log(emailAdmin);
+
+  try {
+    const [result] = await pool.query("SELECT Id_Personnes  FROM utilisateurs WHERE Adress_mail = ? AND Est_Admin = 1", [emailAdmin]);
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Aucun utilisateur trouvé avec cette adresse e-mail." });
+    }
+    res.json({ id: result[0].Id_Personnes });
+  } catch (error) {
+    console.error("Erreur lors de la recherche des utilisateurs :", error);
+    return res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
+  }
+});
+
+
 
 //afficher le nombre de client 
 app.get("/afficherNbClient", async (req, res) => {
@@ -541,6 +573,102 @@ app.post("/lostPassword", async (req, res) => {
 app.listen(3000 , ()=>{
     console.log("le serveur tourne!")
 }) //verifier que le serveur marche
+
+
+
+
+
+
+
+//missions 
+//supprimer une reservation
+// app.post("/ModifyReservation", async (req, res) => {
+//   const Id_Salles = req.body.Id_Salles; // Récupérer Id_Salles depuis le corps de la requête
+//   const Date = req.body.Date; // Récupérer Date depuis le corps de la requête
+//   const Time = req.body.Time; // Récupérer Time depuis le corps de la requête
+//   const ID = req.body.Id_Reservation;
+
+//    // Convertir la date au format YYYY-MM-DD
+//    const formattedDate = moment(Date).format('YYYY/MM/DD')
+
+//   if (!Id_Salles || !Date || !Time) {
+//     return res.status(400).json({ error: "Veuillez fournir les données pour la recherche." });
+//   }
+
+//   try {
+//     const [rows] = await pool.query("UPDATE reservation SET Id_Salles = ?, Date = ?, Time = ? WHERE Id_Reservation = ?", [Id_Salles, formattedDate , Time, ID]);
+//     if (rows.length === 0) {
+//       return res.status(404).json({ error: "Aucune reservation avec ces données." });
+//     }
+//     res.json(rows);
+//   } catch (error) {
+//     console.error("Erreur lors de la recherche des utilisateurs :", error);
+//     res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
+//   }
+// });
+
+app.post("/chercherRservation1", async (req, res) => {
+  const { Id_Salles, Date, Time } = req.body; // Récupérer les paramètres du corps de la requête
+    console.log("executé!!");
+
+    // Construire la requête SQL de manière dynamique
+    let query = "SELECT * FROM reservation WHERE 1=1";
+    const queryParams = [];
+
+
+    if (Id_Salles && Id_Salles != 0) {
+        query += " AND Id_Salles = ?";
+        queryParams.push(Id_Salles);
+    }
+
+    if (Date && Date.trim() !== "") {
+        const formattedDate = moment(Date).format('YYYY/MM/DD')
+        query += " AND Date = ?";
+        queryParams.push(formattedDate);
+    }
+
+    if (Time && Time.trim() !== "") {
+        query += " AND Time = ?";
+        queryParams.push(Time);
+    }
+
+    try {
+        const [rows] = await pool.query(query, queryParams);
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Aucune réservation trouvée avec les données fournies." });
+        }
+        const formattedRows = rows.map(user => ({
+                 ...user,
+                Date: moment(user.Date).format('YYYY/MM/DD'),
+                
+              }));
+        res.json(formattedRows);
+
+    } catch (error) {
+        console.error("Erreur lors de la recherche des réservations :", error);
+        res.status(500).json({ error: "Erreur lors de la recherche des réservations." });
+    }
+}); 
+
+// app.get("/afficherReservation", async (req, res) => {
+//   try {
+//     const [rows] = await pool.query("SELECT Id_Reservation, Details, Date,Time, Id_salles, Materiel, Date_de_reservation, Adress_mail, Nom, Prenom FROM `reservation`, `utilisateurs` WHERE reservation.Id_Personnes_  = utilisateurs.Id_Personnes ");
+//     const formattedRows = rows.map(user => ({
+//       ...user,
+//       Date: moment(user.Date).format('YYYY/MM/DD'),
+      
+//     }));
+
+//     res.json(formattedRows);
+    
+
+//   } catch (error) {
+//     console.error("Erreur lors de la récupération des utilisateurs :", error);
+//     res.status(500).json({ error: "Erreur lors de la récupération des Reservations." });
+//   }
+// });
+
+
 
 
 //exporter pour les test
