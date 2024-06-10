@@ -1,177 +1,156 @@
-const supertest = require("supertest");
-const app = require("./index.js");
 
-// Mock du module de base de données
-jest.mock('./database.js', () => {
-  return {
-    query: jest.fn()
-  };
-});
+// const express = require('express');
+const bcrypt = require('bcrypt');
 
-const pool = require('./database.js');
+const request = require('supertest');
+const pool = require('./database'); 
+const app = require('./index.js'); 
 
-describe("POST /AddClient", () => {
+jest.mock('./database'); // Mocker le module db
 
-  beforeEach(() => {
+// describe('POST /AddClient', () => {
+//   beforeEach(() => {
+//     jest.clearAllMocks(); //reinitialise tous les mocks 
+//   });
+
+//   it('retourne un 400 si le mail n est pas envoyé', async () => {
+//     pool.query.mockResolvedValueOnce([[]]); // ce que on attend dans la base de données
+//     const response = await request(app)
+//       .post('/AddClient')
+//       .send({ Mot_de_pass: 'password', Nom: 'Nom', Prenom: 'Prenom', Date_de_naissance: '2000-01-01' });
+      
+//     expect(response.status).toBe(400);
+//     expect(response.body.error).toBe("L'adresse e-mail est requise");
+//   });
+
+//   it("retourne 400 si pas de mot de passe", async () => {
+//     pool.query.mockResolvedValueOnce([[]]); //API verifie que l'utilisateur n'existe pas
+//     const response = await request(app)
+//       .post('/AddClient')
+//       .send({ Adress_mail: 'test@example.com', Nom: 'Nom', Prenom: 'Prenom', Date_de_naissance: '2000-01-01' });
+      
+//     expect(response.status).toBe(400);
+//     expect(response.body.error).toBe("Le mot de passe est requis");
+//   });
+//   it("retourne 400 si le nom n a pas le bon format", async () => {
+//     pool.query.mockResolvedValueOnce([[]]); 
+//     const response = await request(app)
+//       .post('/AddClient')
+//       .send({ Adress_mail: 'test@example.com', Mot_de_pass: 'password', Nom: 123, Prenom: 'Prenom', Date_de_naissance: '2000-01-01' });
+      
+//     expect(response.status).toBe(400);
+//     expect(response.body.error).toBe("Le nom est requis et doit être une chaîne de caractères");
+//   });
+
+//   it("retourne 400 si pas de date de naissance", async () => {
+//     pool.query.mockResolvedValueOnce([[]]); //API verifie que l'utilisateur n'existe pas
+//     const response = await request(app)
+//       .post('/AddClient')
+//       .send({ Adress_mail: 'test@example.com',Mot_de_pass: 'password', Nom: 'Nom', Prenom: 'Prenom'});
+      
+//     expect(response.status).toBe(400);
+//     expect(response.body.error).toBe("La date de naissance est requise et doit être au format 'yyyy-mm-dd'");
+//   });
+
+//   it("retourne 400 si la date de naissance est de mauvais format", async () => {
+//     pool.query.mockResolvedValueOnce([[]]); //API verifie que l'utilisateur n'existe pas
+//     const response = await request(app)
+//       .post('/AddClient')
+//       .send({ Adress_mail: 'test@example.com',Mot_de_pass: 'password', Nom: 'Nom', Prenom: 'Prenom', Date_de_naissance: '12345'});
+      
+//     expect(response.status).toBe(400);
+//     expect(response.body.error).toBe("La date de naissance est requise et doit être au format 'yyyy-mm-dd'");
+//   });
+//   it('retourne 400 si l utilisateur exist deja', async () => {
+//     pool.query.mockResolvedValueOnce([[{ id: 1, Adress_mail: 'test@example.com' }]]); //dire que l'utilisateur exist
+
+//     const response = await request(app)
+//       .post('/AddClient')
+//       .send({ Adress_mail: 'test@example.com', Mot_de_pass: 'password', Nom: 'Nom', Prenom: 'Prenom', Date_de_naissance: '2000-01-01' });
+      
+//     expect(response.status).toBe(400);
+//     expect(response.body.error).toBe("cet utilisateur existe déja");
+//   });
+
+//   it('should return 201 if the user is successfully created', async () => {
+//     pool.query.mockResolvedValueOnce([[]]); 
+//     pool.query.mockResolvedValueOnce(); //mocker l'insertion
+
+//     const response = await request(app)
+//       .post('/AddClient')
+//       .send({
+//         Adress_mail: 'test@example.com',
+//         Mot_de_pass: 'password',
+//         Nom: 'Nom',
+//         Prenom: 'Prenom',
+//         Numero_de_telephone: '1234567890',
+//         Date_de_naissance: '2000-01-01'
+//       });
+
+//     expect(response.status).toBe(201);
+//     expect(response.body).toBe('ajout réussi');
+//   });
+// });
+
+
+
+describe('POST /login',()=>{
+  beforeEach(()=>{
     jest.clearAllMocks();
   });
 
-  describe("tous les champs sont bien remplis", () => {
-    test("répond avec 201 et message 'ajout réussi'", async () => {
-      pool.query.mockResolvedValueOnce([[]]); // Simule une réponse de requête vide
-      pool.query.mockResolvedValueOnce([{ insertId: 1 }]); // Simule une réponse d'insertion
+  //tests a faire : l'utilisateur n'existe pas 
+  //mauvais mot de passe
+  //test du bon fonctionnement 
+  it('retourne un statut 401 et message "Utilisateur non trouvé" si le mail ne se trouve pas dans la bdd',
+    async()=>{
+      pool.query.mockResolvedValueOnce([[]]);
+      const response = await request(app)
+      .post('/login')
+      .send({ Adress_mail: 'test@example.com', Mot_de_pass: 'password'});
+      expect(response.status).toBe(401);
+      expect(response.body.error).toBe("Utilisateur non trouvé");
 
-      const response = await supertest(app).post("/AddClient").send({
-        Nom: "jest",
-        Prenom: "jest",
-        Adress_mail: "jest@jest.com",
-        Mot_de_pass: "test",
-        Numero_de_telephone: 1234567,
-        Date_de_naissance: "2024-04-21"
-      });
+    }
+  )
 
-      expect(response.statusCode).toBe(201);
-      expect(response.body.message).toBe("ajout réussi");
-    }, 10000);
+  it('retourne un statut 401 et message "mot de passe incorrect!" si le mot de passe est incorrect', async () => {
+    const user = {
+      Id_Personnes: 1,
+      Adress_mail: 'test@example.com',
+      mot_de_pass: await bcrypt.hash('mdpcorrect', 4), // hash d'un mot de passe correct
+    };
+
+    pool.query.mockResolvedValueOnce([[user]]);
+    bcrypt.compare = jest.fn().mockResolvedValueOnce(false); // mot de passe incorrect
+
+    const response = await request(app)
+      .post('/login')
+      .send({ email: 'test@example.com', mdp: 'mdpincorrect' });
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe("mot de passe incorrect!");
   });
 
-  describe("le client existe déjà", () => {
-    test("répond avec le statut 400", async () => {
-      pool.query.mockResolvedValueOnce([[{ Adress_mail: "test@test.com" }]]); // Simule la présence d'un utilisateur existant
+  it('retourne un statut 201 et message "sucess" si le mot de passe et le mail est correct', async () => {
+    const user = {
+      Id_Personnes: 1,
+      Adress_mail: 'test@example.com',
+      mot_de_pass: await bcrypt.hash('mdpcorrect', 4), // hash d'un mot de passe correct
+    };
 
-      const response = await supertest(app).post("/AddClient").send({
-        Nom: "utilisateur",
-        Prenom: "test",
-        Adress_mail: "test@test.com",
-        Mot_de_pass: "test",
-        Numero_de_telephone: 1234567,
-        Date_de_naissance: "2024-04-21"
-      });
+    pool.query.mockResolvedValueOnce([[user]]);
+    bcrypt.compare = jest.fn().mockResolvedValueOnce(true); // mot de passe incorrect
 
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("Cet utilisateur existe déjà");
-    });
-  });
+    const response = await request(app)
+      .post('/login')
+      .send({ email: 'test@example.com', mdp: 'mdpcorrect' });
 
-  describe("Le mot de passe n'est pas fourni", () => {
-    test("répond avec le statut 400", async () => {
-      const response = await supertest(app).post("/AddClient").send({
-        Nom: "utilisateur",
-        Prenom: "test",
-        Adress_mail: "testmdp@test.com",
-        // Mot de passe non fourni
-        Numero_de_telephone: 1234567,
-        Date_de_naissance: "2024-04-21"
-      });
-
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("Le mot de passe est requis");
-    });
-  });
-
-  describe("L'adresse e-mail n'est pas fournie", () => {
-    test("répond avec le statut 400", async () => {
-      const response = await supertest(app).post("/AddClient").send({
-        Nom: "utilisateur",
-        Prenom: "test",
-        // Adresse e-mail non fournie
-        Mot_de_pass: "test",
-        Numero_de_telephone: 1234567,
-        Date_de_naissance: "2024-04-21"
-      });
-
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("L'adresse e-mail est requise");
-    });
-  });
-
-  describe("Le nom n'est pas fourni", () => {
-    test("répond avec le statut 400 et un message d'erreur approprié", async () => {
-      const response = await supertest(app).post("/AddClient").send({
-        // Nom non fourni
-        Prenom: "test",
-        Adress_mail: "test@test.com",
-        Mot_de_pass: "test",
-        Numero_de_telephone: 1234567,
-        Date_de_naissance: "2024-04-21"
-      });
-
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("Le nom est requis et doit être une chaîne de caractères");
-    });
-
-    test("répond avec le statut 400 si le nom n'est pas une chaîne de caractères", async () => {
-      const response = await supertest(app).post("/AddClient").send({
-        Nom: 123, // Nom n'est pas une chaîne de caractères
-        Prenom: "test",
-        Adress_mail: "test@test.com",
-        Mot_de_pass: "test",
-        Numero_de_telephone: 1234567,
-        Date_de_naissance: "2024-04-21"
-      });
-
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("Le nom est requis et doit être une chaîne de caractères");
-    });
-  });
-
-  describe("Le prénom n'est pas fourni ou n'est pas une chaîne de caractères", () => {
-    test("répond avec le statut 400 et un message d'erreur approprié", async () => {
-      const response = await supertest(app).post("/AddClient").send({
-        Nom: "utilisateur",
-        // Prénom non fourni
-        Adress_mail: "test@test.com",
-        Mot_de_pass: "test",
-        Numero_de_telephone: 1234567,
-        Date_de_naissance: "2024-04-21"
-      });
-
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("Le prénom est requis et doit être une chaîne de caractères");
-    });
-
-    test("répond avec le statut 400 si le prénom n'est pas une chaîne de caractères", async () => {
-      const response = await supertest(app).post("/AddClient").send({
-        Nom: "utilisateur",
-        Prenom: 123, // Prénom n'est pas une chaîne de caractères
-        Adress_mail: "test@test.com",
-        Mot_de_pass: "test",
-        Numero_de_telephone: 1234567,
-        Date_de_naissance: "2024-04-21"
-      });
-
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("Le prénom est requis et doit être une chaîne de caractères");
-    });
-  });
-
-  describe("La date de naissance n'est pas fournie ou n'est pas au bon format", () => {
-    test("répond avec le statut 400 si la date de naissance n'est pas fournie", async () => {
-      const response = await supertest(app).post("/AddClient").send({
-        Nom: "utilisateur",
-        Prenom: "test",
-        Adress_mail: "test@test.com",
-        Mot_de_pass: "test",
-        Numero_de_telephone: 1234567,
-        // Date de naissance non fournie
-      });
-
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("La date de naissance est requise et doit être au format 'yyyy-mm-dd'");
-    });
-
-    test("répond avec le statut 400 si la date de naissance n'est pas au bon format", async () => {
-      const response = await supertest(app).post("/AddClient").send({
-        Nom: "utilisateur",
-        Prenom: "test",
-        Adress_mail: "test@test.com",
-        Mot_de_pass: "test",
-        Numero_de_telephone: 1234567,
-        Date_de_naissance: "2024/04/21", // Format de date incorrect
-      });
-
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("La date de naissance est requise et doit être au format 'yyyy-mm-dd'");
-    });
+    expect(response.status).toBe(201);
+    expect(response.body.message).toBe("sucess");
+    expect(response.body.pass).toBe(true);
+    expect(response.body.id).toBe(user.Id_Personnes);
+    
   });
 });
+

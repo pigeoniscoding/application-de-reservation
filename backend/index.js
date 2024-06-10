@@ -33,8 +33,24 @@ app.get("/test",(req,res)=>{ //tester la connection
 app.post("/disponibilite",async (req,res)=>{  //va recevoir date et Id_salle (id)
     const { date, id } = req.body
     
-    const parsedDate = new Date(date);   //met la date recu a une forme laisible par phpmyadmin
-    const formattedDate = parsedDate.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
+    console.log ("avant formattage pour disponibilité : " + date);
+    // const parsedDate = new Date(date);   //met la date recu a une forme laisible par phpmyadmin
+    // console.log (parsedDate);
+    // const formattedDate = parsedDate.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
+    // console.log ("aprés formattage pour disponibilité : " + formattedDate);
+
+    // Convertir en objet Date en prenant en compte le fuseau horaire local
+    const localDate = new Date(date);
+
+    // Obtenir l'année, le mois et le jour en fonction du fuseau horaire local
+    const year = localDate.getFullYear();
+    const month = ('0' + (localDate.getMonth() + 1)).slice(-2); // Les mois sont de 0 à 11, donc ajouter 1
+    const day = ('0' + localDate.getDate()).slice(-2);
+
+    // Formater la date en 'YYYY-MM-DD'
+    const formattedDate = `${year}-${month}-${day}`;
+    console.log ("apres formattage pour disponibilité : " + formattedDate);
+
     
     
    let [result] =  await pool.query ("SELECT Time FROM `reservation` WHERE Id_Salles=? AND Date=?;", [id,formattedDate])
@@ -48,9 +64,20 @@ app.post("/disponibilite",async (req,res)=>{  //va recevoir date et Id_salle (id
 app.post("/reservation",async (req,res)=>{
     const { id_user,details,date,id,idTime,equipement } = req.body
     
-    const parsedDate = new Date(date);
-    const formattedDate = parsedDate.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
-    
+    // const parsedDate = new Date(date);
+    // const formattedDate = parsedDate.toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
+    const localDate = new Date(date);
+
+    // Obtenir l'année, le mois et le jour en fonction du fuseau horaire local
+    const year = localDate.getFullYear();
+    const month = ('0' + (localDate.getMonth() + 1)).slice(-2); // Les mois sont de 0 à 11, donc ajouter 1
+    const day = ('0' + localDate.getDate()).slice(-2);
+
+    // Formater la date en 'YYYY-MM-DD'
+    const formattedDate = `${year}-${month}-${day}`;
+    console.log ("apres formattage pour disponibilité : " + formattedDate);
+
+    console.log("la date avant formattage: " + date);
     console.log(formattedDate);
     console.log(idTime);
     console.log(id);
@@ -144,10 +171,9 @@ app.post("/loginAdmin",async(req, res)=> {
     }
 })
 
-//route pour login des admins test
 app.post("/loginAdminTest",async(req, res)=> {
   const {email,mdp} = req.body;
-  const [result] = await pool.query ("SELECT * FROM utilisateurs WHERE Est_Admin = 1",[email]);
+  const [result] = await pool.query ("SELECT * FROM `utilisateurs` WHERE Adress_mail =? AND Est_Admin = 1;",[email]);
   if (result.length === 0){
       return res.status(401).json({error : "Utilisateur non trouvé"});
   }
@@ -162,6 +188,40 @@ app.post("/loginAdminTest",async(req, res)=> {
       res.status(201).json({message:"sucess",pass: passwordMatch ,id: user.Id_Personnes});
   }
 })
+
+//route pour login des admins test
+//mission : RH
+// app.post("/loginAdminTest",async(req, res)=> {
+//   const {email,mdp} = req.body;
+//   const [result] = await pool.query ("SELECT * FROM utilisateurs WHERE Est_Admin = 1 OR EST_RH = 1",[email]);
+//   if (result.length === 0){
+//       return res.status(401).json({error : "Utilisateur non trouvé"});
+//   }
+//   console.log([result][0][0])
+//   const user = [result][0][0];
+//   const passwordMatch = await bcrypt.compare(mdp, user.mot_de_pass);
+//   let Role ="";
+//   let Est_Admin = user.Est_Admin;
+//   let Est_RH = user.EST_RH;
+//   console.log(Est_Admin);
+//   console.log(Est_RH);
+//   if(Est_Admin == 1){
+//     Role = "Admin";
+//   }
+//   if(Est_RH){
+//     Role = "RH";
+//   }
+//   if (Est_Admin && Est_RH){
+//     Role = "Admin";
+//   }
+//   console.log(passwordMatch);
+//   if (passwordMatch === false){
+//       return res.status(401).json({error: "mot de passe incorrect!"});
+//   }
+//   else{
+//       res.status(201).json({message:"sucess",pass: passwordMatch ,id: user.Id_Personnes, Role: Role});
+//   }
+// })
 
 
 //route pour afficher les utilisateurs
@@ -402,35 +462,35 @@ app.get("/afficherReservation", async (req, res) => {
 
 //chercher une reservation
 
-// app.post("/chercherRservation", async (req, res) => {
-//   const Id_Salles = req.body.Id_Salles; // Récupérer Id_Salles depuis le corps de la requête
-//   const ReservationDate = req.body.Date; // Récupérer Date depuis le corps de la requête
-//   const Time = req.body.Time; // Récupérer Time depuis le corps de la requête
+app.post("/chercherRservation", async (req, res) => {
+  const Id_Salles = req.body.Id_Salles; // Récupérer Id_Salles depuis le corps de la requête
+  const ReservationDate = req.body.Date; // Récupérer Date depuis le corps de la requête
+  const Time = req.body.Time; // Récupérer Time depuis le corps de la requête
 
-//   const formattedDate = moment(ReservationDate).format('YYYY/MM/DD')
+  const formattedDate = moment(ReservationDate).format('YYYY/MM/DD')
 
-//   if (!Id_Salles || !ReservationDate || !Time) {
-//     return res.status(400).json({ error: "Veuillez fournir les données pour la recherche." });
-//   }
+  if (!Id_Salles || !ReservationDate || !Time) {
+    return res.status(400).json({ error: "Veuillez fournir les données pour la recherche." });
+  }
 
-//   try {
-//     const [rows] = await pool.query("SELECT * FROM reservation WHERE Id_Salles = ? AND Date = ? AND Time = ?", [Id_Salles, formattedDate, Time]);
-//     if (rows.length === 0) {
-//       return res.status(404).json({ error: "Aucune reservation avec ces données." });
-//     }
-//     const formattedRows = rows.map(user => ({
-//       ...user,
-//       Date: moment(user.Date).format('YYYY/MM/DD'),
+  try {
+    const [rows] = await pool.query("SELECT * FROM reservation WHERE Id_Salles = ? AND Date = ? AND Time = ?", [Id_Salles, formattedDate, Time]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Aucune reservation avec ces données." });
+    }
+    const formattedRows = rows.map(user => ({
+      ...user,
+      Date: moment(user.Date).format('YYYY/MM/DD'),
       
-//     }));
+    }));
 
-//     res.json(formattedRows);
+    res.json(formattedRows);
     
-//   } catch (error) {
-//     console.error("Erreur lors de la recherche des utilisateurs :", error);
-//     res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
-//   }
-// });
+  } catch (error) {
+    console.error("Erreur lors de la recherche des utilisateurs :", error);
+    res.status(500).json({ error: "Erreur lors de la recherche des utilisateurs." });
+  }
+});
 
 //supprimer une reservation
 app.post("/deleteReservation", async (req, res) => {
@@ -607,48 +667,49 @@ app.listen(3000 , ()=>{
 //   }
 // });
 
-app.post("/chercherRservation1", async (req, res) => {
-  const { Id_Salles, Date, Time } = req.body; // Récupérer les paramètres du corps de la requête
-    console.log("executé!!");
+//pour la selection des salles selon les champ
+// app.post("/chercherRservation1", async (req, res) => {
+//   const { Id_Salles, Date, Time } = req.body; // Récupérer les paramètres du corps de la requête
+//     console.log("executé!!");
 
-    // Construire la requête SQL de manière dynamique
-    let query = "SELECT * FROM reservation WHERE 1=1";
-    const queryParams = [];
+//     // Construire la requête SQL de manière dynamique
+//     let query = "SELECT * FROM reservation WHERE 1=1";
+//     const queryParams = [];
 
 
-    if (Id_Salles && Id_Salles != 0) {
-        query += " AND Id_Salles = ?";
-        queryParams.push(Id_Salles);
-    }
+//     if (Id_Salles && Id_Salles != 0) {
+//         query += " AND Id_Salles = ?";
+//         queryParams.push(Id_Salles);
+//     }
 
-    if (Date && Date.trim() !== "") {
-        const formattedDate = moment(Date).format('YYYY/MM/DD')
-        query += " AND Date = ?";
-        queryParams.push(formattedDate);
-    }
+//     if (Date && Date.trim() !== "") {
+//         const formattedDate = moment(Date).format('YYYY/MM/DD')
+//         query += " AND Date = ?";
+//         queryParams.push(formattedDate);
+//     }
 
-    if (Time && Time.trim() !== "") {
-        query += " AND Time = ?";
-        queryParams.push(Time);
-    }
+//     if (Time && Time.trim() !== "") {
+//         query += " AND Time = ?";
+//         queryParams.push(Time);
+//     }
 
-    try {
-        const [rows] = await pool.query(query, queryParams);
-        if (rows.length === 0) {
-            return res.status(404).json({ error: "Aucune réservation trouvée avec les données fournies." });
-        }
-        const formattedRows = rows.map(user => ({
-                 ...user,
-                Date: moment(user.Date).format('YYYY/MM/DD'),
+//     try {
+//         const [rows] = await pool.query(query, queryParams);
+//         if (rows.length === 0) {
+//             return res.status(404).json({ error: "Aucune réservation trouvée avec les données fournies." });
+//         }
+//         const formattedRows = rows.map(user => ({
+//                  ...user,
+//                 Date: moment(user.Date).format('YYYY/MM/DD'),
                 
-              }));
-        res.json(formattedRows);
+//               }));
+//         res.json(formattedRows);
 
-    } catch (error) {
-        console.error("Erreur lors de la recherche des réservations :", error);
-        res.status(500).json({ error: "Erreur lors de la recherche des réservations." });
-    }
-}); 
+//     } catch (error) {
+//         console.error("Erreur lors de la recherche des réservations :", error);
+//         res.status(500).json({ error: "Erreur lors de la recherche des réservations." });
+//     }
+// }); 
 
 // app.get("/afficherReservation", async (req, res) => {
 //   try {
@@ -667,6 +728,57 @@ app.post("/chercherRservation1", async (req, res) => {
 //     res.status(500).json({ error: "Erreur lors de la récupération des Reservations." });
 //   }
 // });
+
+
+//modifier le profil d'un client projet 1
+// app.post("/modifierclient",async (req,res)=>{
+//   const { newPassword,oldPassword,nom,prenom,tel,date_naissance,id } = req.body
+  
+//   const [result] = await pool.query ("SELECT * FROM `utilisateurs` WHERE Id_Personnes  =? ;",[id]);
+//   if (result.length === 0){
+//       return res.status(401).json({error : "Utilisateur non trouvé"});
+//   }
+//   console.log([result][0][0])
+//   const user = [result][0][0];
+//   const passwordMatch = await bcrypt.compare(oldPassword, user.mot_de_pass);
+//   console.log(passwordMatch);
+//   if (passwordMatch == false){
+//     console.log("je suis rentré");
+//     return res.status(401).json({error: "mot de passe incorrect!"});
+//   }
+//   else{
+//     const hashedPassword = await bcrypt.hash(newPassword, 4);
+//     await pool.query ("UPDATE `utilisateurs` SET `Nom`=?,`Prenom`=?,`Numero_de_telephone`=?,`Date_de_naissance`=?, `mot_de_pass`=? WHERE Id_Personnes  = ?", [nom,prenom,tel,date_naissance,hashedPassword,id])
+   
+//     res.status(200).json({ message: "Success" });
+
+//   }
+
+  
+
+
+// })
+
+//supprimer un client et les reservations a venir
+// app.post("/supprimerClient",async (req,res)=>{
+//   const {id } = req.body
+//   console.log(id);
+  
+//   const [result] = await pool.query ("SELECT * FROM `utilisateurs` WHERE Id_Personnes  =? ;",[id]);
+//   if (result.length === 0){
+//       return res.status(401).json({error : "Utilisateur non trouvé"});
+//   }
+//   else{
+//     await pool.query ("DELETE FROM `reservation` WHERE Id_Personnes_  =? AND Date > NOW()", [id])
+//     await pool.query ("DELETE FROM `utilisateurs` WHERE Id_Personnes  =?", [id])
+   
+//     res.status(200).json({ message: "Success" });
+//   }
+ 
+
+//   })
+
+
 
 
 
