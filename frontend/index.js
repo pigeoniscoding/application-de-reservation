@@ -78,7 +78,8 @@ function fetchreservation(details,dateDate, Id_salle, idTime,equipement) {
             handleDates();
             handelAvailablity(timeData);
             selectBlock(dataDate);
-            closeBookingModal();//ne marche pas?
+            alert("votre reservation a bien été enregistrée!");
+            
         } else {
             // Sinon, affichez un message d'erreur ou effectuez une action appropriée
             console.error("Erreur lors de la réservation.");
@@ -346,7 +347,7 @@ document.querySelector(".submit-btn").addEventListener("click", function recuper
     else {
         console.log (equipement);
         fetchreservation(details,dataDate, Id_salle, idTime, equipement);
-        closeBookingModal(); //ne marche pas
+        alert ("votre reservation a bien eu lieu");
+        
     }
 })
-

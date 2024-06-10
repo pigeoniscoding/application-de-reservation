@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation hebdo</title>
+    <script type="module" src="reserHebdo.js" defer></script>
+    <style>
+        textarea {
+          width: 100%; /* Pour que la zone de texte prenne toute la largeur disponible */
+          height: 150px; /* Hauteur personnalisée */
+          padding: 10px; /* Ajoute un peu de padding pour un meilleur confort */
+          box-sizing: border-box; /* Assure que le padding est inclus dans la largeur totale */
+        }
+      </style>
+</head>
+<body>
+    <input type="text" name="startDate" id="startDate" placeholder="Date de Début" required>
+    <br />
+    <input  type="text" name="endDate" id="endDate" placeholder="Date de fin" required>
+    <br />
+    <label for="hour"><h5>Heur:</h></label>
+                                        <select name="hour" id="hour" required>
+                                          
+                                            <option selected>09:00:00</option>
+                                            <option>10:00:00</option>
+                                            <option>11:00:00</option>
+                                            <option>12:00:00</option>
+                                            <option>13:00:00</option>
+                                            <option>14:00:00</option>
+                                            <option>15:00:00</option>
+                                            <option>16:00:00</option>
+    <br />
+    <textarea type="text" name="details" id="details" placeholder="Détails" ></textarea>
+    <br />
+    <label for="client-equipement"><h5>Equipement:</h5></label>
+                                        <select name="client-equipement" id="client-equipement" required>
+                                            <!-- peut etre utiliser pour la selection du materiel -->
+                                            <option selected>pas d'équipements</option>
+                                            <option>équipements de capture video</option>
+                                            <option>équipements de capture audio</option>
+                                            <option>équipements de captures video et audio</option>
+    <br />
+    <br />
+    
+
+    <button id="btn">Réserver</button>
+</body>
+</html>

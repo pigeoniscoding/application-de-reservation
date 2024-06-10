@@ -16,7 +16,8 @@
         <!-- ajouter des Google Fonts -->
         <!--==================== FONT ====================-->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
-        
+       <!-- modif -->
+        <script type="module" src="index.js" defer></script> 
 
     </head>
 
@@ -31,6 +32,16 @@
         <!--==================== MAIN ====================-->
         <!-- main = designer la partie primaire pour les moteur de recherche -->
         <main class="main"> 
+
+             <!-- situation suppression du profil -->
+             <!-- <a href="supprimCompte.html">voulez vous supprimer votre compte?</a> -->
+
+             <!-- situation reservation hebdo -->
+             <!-- <a href="reserHbedo.html">reservation recurrente</a> -->
+
+            <!-- situation pour modifier le profil -->
+            <!-- <a href="http://127.0.0.1:5500/frontend/modif.html">voulez vous modifier votre profil ?</a>  -->
+            
             <!--==================== CALENDAR ====================-->
             <div class="calendar-wrapper" style="visibility: hidden;">
 
@@ -135,7 +146,7 @@
                                         
                                     </ul>
                                 </div>
-                            <button type="button" class="close-btn" onclick="document.getElementById('booking-time-modal').classList.remove('open-booking-time-modal')">&times;</button> 
+                            <button type="button" class="close-btn" onclick="document.getElementById('booking-time-modal').classList.remove('open-booking-time-modal');location.reload();">&times;</button> 
                             <!-- times is an entity name that represents x makes it easier for typing!-->
                         </div>
                     </div>
@@ -171,8 +182,7 @@
                                         <label for="client-equipement"><h6>Equipement:</h6></label>
                                         <select name="client-equipement" id="client-equipement" required>
                                             <!-- peut etre utiliser pour la selection du materiel -->
-                                            <option selected>Choisissez votre equipement:</option>
-                                            <option>pas d'équipements</option>
+                                            <option selected>pas d'équipements</option>
                                             <option>équipements de capture video</option>
                                             <option>équipements de capture audio</option>
                                             <option>équipements de captures video et audio</option>
@@ -187,7 +197,7 @@
                                 </div>
                             </form>
                             <button type="button" class="submit-btn">Envoyer</button>
-                            <button type="button" class="close-btn" onclick="document.getElementById('booking-modal').classList.remove('open-booking-modal')">&times;</button>
+                            <button type="button" class="close-btn" onclick="document.getElementById('booking-modal').classList.remove('open-booking-modal');location.reload(); ">&times;</button>
                             <!-- faudra ajouter un bouton submit -->
                             <!-- sera important pour remplir la bdd -->
                         </div>
@@ -199,7 +209,7 @@
 
         </footer>
         <!--==================== CALENDAR JS ====================-->
-        <script type="module" src="index.js" defer></script>
+        <!-- modif -->
         
         <!--==================== JQUERY ====================-->
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
